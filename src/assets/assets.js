@@ -59,7 +59,7 @@ import p_img54 from "./kid-w11.webp";
 import p_img55 from "./kid-w12.webp";
 
 import logo2 from "./logo2.jpg";
-import logo3 from "./logo3.jpg"
+import logo3 from "./logo3.jpg";
 
 import hero_img from "./hero_img.png";
 import hero1_img from "./hero1_img.jpg";
@@ -81,9 +81,12 @@ import razorpay_logo from "./razorpay_logo.png";
 import stripe_logo from "./stripe_logo.png";
 import cross_icon from "./cross_icon.png";
 import Ecart_logo from "./Ecart-Logo.png";
+
+import boxIcon from "./box.png";
 export const assets = {
   //   logo,
   //   logo1,
+  boxIcon,
   logo2,
   logo3,
   Ecart_logo,
