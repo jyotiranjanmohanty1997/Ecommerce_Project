@@ -74,14 +74,14 @@ const ShopContextProvider = ({ children }) => {
     setCartItems(cartCopy);
   };
 
-  //---------------------PLACE ORDER ---------------------------
+  // ======================= PLACE ORDER =======================
   const placeOrder = (address, paymentType) => {
     if (getCartCount() === 0) {
       toast.error("Your cart is empty!");
       return;
     }
 
-    
+    // Convert cart → items list
     const items = [];
 
     for (const pid in cartItems) {
@@ -98,7 +98,7 @@ const ShopContextProvider = ({ children }) => {
       }
     }
 
-   
+    // Create final order object
     const order = {
       items,
       address,
@@ -108,13 +108,15 @@ const ShopContextProvider = ({ children }) => {
       isPaid: paymentType !== "COD", // If COD → unpaid
     };
 
+    // Save to Orders array
     setOrders([...orders, order]);
 
-    
+    // Clear cart
     setCartItems({});
 
     toast.success("Order placed successfully!");
-    navigate("/order"); 
+    navigate("/order"); // Go to order page
+  };
 
   return (
     <ShopContext.Provider
