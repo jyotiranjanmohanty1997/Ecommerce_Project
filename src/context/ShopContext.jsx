@@ -12,18 +12,13 @@ const ShopContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+
   const [cartItems, setCartItems] = useState({});
   const [orders, setOrders] = useState([]);
 
   const navigate = useNavigate();
 
-  const login = (email, name) => setUser({ email, name });
-  const logout = () => {
-    setUser(null);
-    navigate("/login");
-  };
-
-  // ---------------- Add to Cart ----------------
+  // ---------------- ADD TO CART ----------------
   const addToCart = (itemId, size) => {
     if (!size) {
       toast.error("Select a size!");
@@ -41,6 +36,7 @@ const ShopContextProvider = ({ children }) => {
     toast.success("Added to cart!");
   };
 
+  // ---------------- COUNT ITEMS ----------------
   const getCartCount = () => {
     let total = 0;
     for (const pid in cartItems) {
@@ -51,10 +47,13 @@ const ShopContextProvider = ({ children }) => {
     return total;
   };
 
+  // ---------------- TOTAL AMOUNT ----------------
   const getCartAmount = () => {
     let total = 0;
     for (const pid in cartItems) {
       const product = products.find((p) => p._id === pid);
+      if (!product) continue;
+
       for (const size in cartItems[pid]) {
         total += product.price * cartItems[pid][size];
       }
@@ -62,8 +61,10 @@ const ShopContextProvider = ({ children }) => {
     return total;
   };
 
+  // ---------------- UPDATE QTY ----------------
   const updateQuantity = (itemId, size, quantity) => {
     let cartCopy = structuredClone(cartItems);
+
     if (quantity <= 0) {
       delete cartCopy[itemId][size];
       if (Object.keys(cartCopy[itemId]).length === 0) delete cartCopy[itemId];
@@ -73,52 +74,76 @@ const ShopContextProvider = ({ children }) => {
     setCartItems(cartCopy);
   };
 
-  // ---------------- Place Order ----------------
-  const placeOrder = () => {
+  //---------------------PLACE ORDER ---------------------------
+  const placeOrder = (address, paymentType) => {
     if (getCartCount() === 0) {
       toast.error("Your cart is empty!");
       return;
     }
 
-    const orderList = [];
+    
+    const items = [];
+
     for (const pid in cartItems) {
       const product = products.find((p) => p._id === pid);
+
       for (const size in cartItems[pid]) {
         const qty = cartItems[pid][size];
-        orderList.push({
-          ...product,
-          size,
+
+        items.push({
+          product,
           quantity: qty,
-          date: new Date().toLocaleDateString(),
+          size,
         });
       }
     }
 
-    setOrders(orderList);
+   
+    const order = {
+      items,
+      address,
+      amount: getCartAmount() + delivery_fee,
+      paymentType,
+      orderDate: new Date().toLocaleString(),
+      isPaid: paymentType !== "COD", // If COD → unpaid
+    };
+
+    setOrders([...orders, order]);
+
+    
     setCartItems({});
+
     toast.success("Order placed successfully!");
-  };
+    navigate("/order"); 
 
   return (
     <ShopContext.Provider
       value={{
         user,
-        login,
-        logout,
+        login: (email, name) => setUser({ email, name }),
+        logout: () => {
+          setUser(null);
+          navigate("/login");
+        },
+
         products,
         currency,
         delivery_fee,
+
         search,
         setSearch,
         showSearch,
         setShowSearch,
+
         cartItems,
         addToCart,
-        getCartCount,
         updateQuantity,
+        getCartCount,
         getCartAmount,
+
         orders,
         placeOrder,
+
         navigate,
       }}
     >
